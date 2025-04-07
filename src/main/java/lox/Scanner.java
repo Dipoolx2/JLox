@@ -110,10 +110,14 @@ public class Scanner {
                 if (match('/')) {
                     // Using peek() for newlines s.t. the line number gets updated properly later on.
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (match('*')) {
+                    // C-style block comments (/* */)
+                    consumeBlockComment();
                 } else {
                     addToken(SLASH);
                 }
                 break;
+
 
             // A few meaningless cases (spaces, tabs, newlines).
             case ' ':
@@ -202,6 +206,36 @@ public class Scanner {
         // Trim the surrounding quotes to get the literal value.
         String value = source.substring(start + 1, current - 1);
         addToken(STRING, value); // Add the token to the token list.
+    }
+
+    /**
+     * Consumes a c-style block comment. Increments {@code current} until the end of the block comment has been reached.
+     * Nested block comments are supported by this. No tokens are added to the token list.
+     */
+    private void consumeBlockComment() {
+        int blockDepth = 1; // Allow for nesting; keep track of block depth
+        while (blockDepth > 0) {
+            if (peek() == '\n') line++; // Multiline support
+
+            if (isAtEnd()) { // Handles unclosed block comments
+                Lox.error(line, "A block comment was not terminated before the end of the file.");
+                return;
+            }
+
+            // Both the current and next character are needed to properly support block comments.
+            char current = peek();
+            char next = peekNext();
+
+            if (current == '*' && next == '/') { // Closing block comment: decrease block depth
+                advance();
+                advance();
+                blockDepth--;
+            } else if (current == '/' && next == '*') { // Opening block comment: increase block depth
+                advance();
+                advance();
+                blockDepth++;
+            } else advance(); // If no block comment characters, do as regular.
+        }
     }
 
     /**
