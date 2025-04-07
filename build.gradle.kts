@@ -33,6 +33,16 @@ tasks.register<JavaExec>("runSilent") {
     args = listOf("src/main/resources/script.lox") // Pass the file as an argument
 }
 
+tasks.register<JavaExec>("runGeneratorTool") {
+    group = "application"
+    description = "Runs the generator tool"
+    mainClass.set("tool.GenerateAst")
+    classpath = sourceSets["main"].runtimeClasspath
+    standardOutput = System.out
+    errorOutput = System.err
+    args = listOf("src/main/java/lox")
+}
+
 tasks.register<JavaExec>("runSilentPrompt") {
     group = "application"
     description = "Runs the application without Gradle logs and allows interactive input"
