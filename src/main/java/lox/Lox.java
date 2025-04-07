@@ -62,7 +62,7 @@ public class Lox {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for (;;) {
+        for (;;) { // Repeat indefinitely:
             System.out.print("> ");
             String line = reader.readLine();
 
@@ -81,12 +81,18 @@ public class Lox {
      */
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
+
+        // Scanning phase
         List<Token> tokens = scanner.scanTokens();
 
-        // For now, just print the tokens
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
+        // Parsing phase
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+
+        // STop if there was a syntax error.
+        if (hadError) return;
+
+        System.out.println(new AstPrinter().print(expression));
     }
 
     /**
@@ -98,6 +104,20 @@ public class Lox {
      */
     public static void error(int line, String message) {
         report(line, "", message);
+    }
+
+    /**
+     * Signals an error with the given parameters.
+     * @param token     The token of the script where the error was found.
+     * @param message   The message that describes the nature of the error.
+     * @see #report(int, String, String)
+     */
+    public static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+            return;
+        }
+        report(token.line, "at '" + token.lexeme + "'", message);
     }
 
     /**
