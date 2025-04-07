@@ -45,20 +45,25 @@ public class Interpreter implements Expr.Visitor<Object> {
                 return (double) left - (double) right;
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+                if ((double) right == 0) // Can't divide by zero in Lox.
+                    throw new RuntimeError(expr.operator, "Division by zero");
                 return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
                 return (double) left * (double) right;
             case PLUS:
                 // Plus can be applied to both numbers and strings.
+
+                if (left instanceof String || right instanceof String) {
+                    return stringify(left) + stringify(right);
+                }
+
                 if (left instanceof Double && right instanceof Double) {
                     return (double) left + (double) right;
-                } else if (left instanceof String && right instanceof String) {
-                    return left + (String) right;
                 }
 
                 // Types are already checked, so the helper function does not need to be used.
-                throw new RuntimeError(expr.operator, "Operands must be two numbers of two strings");
+                throw new RuntimeError(expr.operator, "Operands must be two numbers or there must be a string.");
         }
 
         // The operand is not valid; should be unreachable.
