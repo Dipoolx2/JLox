@@ -60,7 +60,7 @@ public class GenerateAst {
 
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
-            writer.println("        public R visit" + typeName + baseName + "(" +
+            writer.println("        R visit" + typeName + baseName + "(" +
                     typeName + " " + baseName.toLowerCase() + ");");
         }
 
@@ -92,7 +92,7 @@ public class GenerateAst {
         // Fields.
         writer.println();
         for (String field : fields) {
-            writer.println("        private final " + field + ";");
+            writer.println("        public final " + field + ";");
         }
 
         writer.println("    }");

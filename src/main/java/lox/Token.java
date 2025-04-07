@@ -4,10 +4,10 @@ package lox;
  * Represents a token as used by the scanner.
  */
 public class Token {
-    private final TokenType type; // The category of this token (e.g., NUMBER, IDENTIFIER, PLUS, etc.).
-    private final String lexeme;  // The exact substring from the source code that forms this token.
-    private final Object literal; // The interpreted value of the token, or null if not applicable.
-    private final int line;       // The line number where this token appears in the source code.
+    public final TokenType type; // The category of this token (e.g., NUMBER, IDENTIFIER, PLUS, etc.).
+    public final String lexeme;  // The exact substring from the source code that forms this token.
+    public final Object literal; // The interpreted value of the token, or null if not applicable.
+    public final int line;       // The line number where this token appears in the source code.
 
     /**
      * Constructs a {@link Token} object.

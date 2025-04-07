@@ -9,10 +9,10 @@ import java.util.List;
  */
 public abstract class Expr {
     public interface Visitor<R> {
-        public R visitBinaryExpr(Binary expr);
-        public R visitGroupingExpr(Grouping expr);
-        public R visitLiteralExpr(Literal expr);
-        public R visitUnaryExpr(Unary expr);
+        R visitBinaryExpr(Binary expr);
+        R visitGroupingExpr(Grouping expr);
+        R visitLiteralExpr(Literal expr);
+        R visitUnaryExpr(Unary expr);
     }
     public static class Binary extends Expr {
         public Binary(Expr left, Token operator, Expr right) {
@@ -26,9 +26,9 @@ public abstract class Expr {
             return visitor.visitBinaryExpr(this);
         }
 
-        private final Expr left;
-        private final Token operator;
-        private final Expr right;
+        public final Expr left;
+        public final Token operator;
+        public final Expr right;
     }
     public static class Grouping extends Expr {
         public Grouping(Expr expression) {
@@ -40,7 +40,7 @@ public abstract class Expr {
             return visitor.visitGroupingExpr(this);
         }
 
-        private final Expr expression;
+        public final Expr expression;
     }
     public static class Literal extends Expr {
         public Literal(Object value) {
@@ -52,7 +52,7 @@ public abstract class Expr {
             return visitor.visitLiteralExpr(this);
         }
 
-        private final Object value;
+        public final Object value;
     }
     public static class Unary extends Expr {
         public Unary(Token operator, Expr right) {
@@ -65,8 +65,8 @@ public abstract class Expr {
             return visitor.visitUnaryExpr(this);
         }
 
-        private final Token operator;
-        private final Expr right;
+        public final Token operator;
+        public final Expr right;
     }
 
     public abstract <R> R accept(Visitor<R> visitor);
