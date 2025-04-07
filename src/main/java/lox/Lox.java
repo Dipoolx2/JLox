@@ -14,7 +14,10 @@ import java.nio.file.Paths;
  */
 public class Lox {
 
-    private static boolean hadError = false;
+    private static final Interpreter interpreter = new Interpreter();
+
+    private static boolean hadError = false;        // Static errors
+    private static boolean hadRuntimeError = false; // Runtime errors
 
     /**
      * Lets user run the Lox interpreter with either an interactive prompt, or source code as input.
@@ -50,6 +53,10 @@ public class Lox {
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
+
+        // Check for errors and signal unusual termination to the shell
+        if (hadError) System.exit(65);
+        if (hadRuntimeError) System.exit(70);
     }
 
     /**
@@ -89,10 +96,11 @@ public class Lox {
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
 
-        // STop if there was a syntax error.
+        // Stop if there was a syntax error.
         if (hadError) return;
 
-        System.out.println(new AstPrinter().print(expression));
+        // Interpreting phase
+        interpreter.interpret(expression);
     }
 
     /**
@@ -117,7 +125,17 @@ public class Lox {
             report(token.line, " at end", message);
             return;
         }
-        report(token.line, "at '" + token.lexeme + "'", message);
+        report(token.line, " at '" + token.lexeme + "'", message);
+    }
+
+    /**
+     * Reports a runtime error to the console and sets the {@code hadRuntimeError} flag to true.
+     * @param error The error that has to be reported.
+     */
+    public static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() +
+                "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
     }
 
     /**
