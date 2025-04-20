@@ -26,7 +26,7 @@ public class Interpreter implements Expr.Visitor<Object> {
         switch (expr.operator.type) {
             case BANG_EQUAL:
                 return !isEqual(left, right); // Use custom method
-            case EQUAL:
+            case EQUAL_EQUAL:
                 return isEqual(left, right); // Use custom method
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
