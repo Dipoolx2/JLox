@@ -26,7 +26,7 @@ public class Interpreter implements Expr.Visitor<Object> {
         switch (expr.operator.type) {
             case BANG_EQUAL:
                 return !isEqual(left, right); // Use custom method
-            case EQUAL:
+            case EQUAL_EQUAL:
                 return isEqual(left, right); // Use custom method
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
@@ -99,7 +99,7 @@ public class Interpreter implements Expr.Visitor<Object> {
     }
 
     /**
-     * Checks whether the given operands are both a double. If they aren't, a runtime exception is thrown.
+     * Checks whether the given operands are both a double. If they aren't, a {@link RuntimeError} is thrown.
      * @param operator  The operator associated with the given operand.
      * @param left      The left operand whose type is checked.
      * @param right     The right operand whose type is checked.
@@ -111,7 +111,7 @@ public class Interpreter implements Expr.Visitor<Object> {
     }
 
     /**
-     * Checks whether the given operand is a double. If it isn't, a runtime exception is thrown.
+     * Checks whether the given operand is a double. If it isn't, a {@link RuntimeError} is thrown.
      * @param operator  The operator associated with the given operand.
      * @param operand   The operand whose type is checked.
      * @see #checkNumberOperands(Token, Object, Object)
