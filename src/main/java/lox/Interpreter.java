@@ -4,6 +4,8 @@ import java.util.List;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
+    private Environment environment = new Environment();
+
     /**
      * Runs the interpreter for the given statement list, and handles runtime errors if need be.
      * Executes the statements in order in which they are given.
@@ -103,7 +105,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return null;
+        return environment.get(expr.name);
     }
 
     @Override
@@ -121,6 +123,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) { // Also allow defining variables with null.
+            value = evaluate(stmt.initializer);
+        }
+
+        environment.define(stmt.name.lexeme, value);
         return null;
     }
 
