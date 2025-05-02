@@ -33,5 +33,20 @@ public class Environment {
                 "Undefined variable '" + name.lexeme + "'.");
     }
 
+    /**
+     * Variable assignment in this environment.
+     * @param name  The name of the variable to assign to
+     * @param value The value to assign to the variable.
+     * @throws RuntimeError In the case that the variable to be assigned to is not yet declared.
+     */
+    public void assign(Token name, Object value) {
+        if (values.containsKey(name.lexeme)) {
+            values.put(name.lexeme, value);
+            return;
+        }
+
+        throw new RuntimeError(name,
+                "Undefined variable '" + name.lexeme + "'.");
+    }
 
 }

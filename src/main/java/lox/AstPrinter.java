@@ -16,6 +16,11 @@ public class AstPrinter implements Expr.Visitor<String> {
         return expr.accept(this);
     }
 
+    @Override
+    public String visitAssignExpr(Expr.Assign expr) {
+        return parenthesize("assign " + expr.name.lexeme + ":", expr.value);
+    }
+
     // From here on the methods are all implementations for each expression type.
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {

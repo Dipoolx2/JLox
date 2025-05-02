@@ -110,11 +110,32 @@ public class Parser {
 
     /**
      * Generates AST for expression from the current token, with grammar rule: <br>
-     * {@code expression -> equality} <br>according to the rules of recursive descent.
+     * {@code expression -> assignment} <br>according to the rules of recursive descent.
      * @return An AST of type {@link Expr}
      */
     private Expr expression() {
-        return equality(); // Simple rule.
+        return assignment(); // Simple rule.
+    }
+
+    /**
+     * Generates AST for an assignment expression from the current token.
+     * @return An AST of type {@link Expr}.
+     */
+    private Expr assignment() {
+        Expr expr = equality(); // First parse the entire LHS. It can be more than just one token.
+
+        if (match(EQUAL)) { // If not it was equality() to begin with.
+            Token equals = previous();
+            Expr value = assignment(); // Parse it even in case of invalid assignment target.
+
+            if (expr instanceof Expr.Variable) { // Now we check for correct assignment target.
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
 
     /**
