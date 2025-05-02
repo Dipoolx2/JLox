@@ -1,16 +1,19 @@
 package lox;
 
-public class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
+
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     /**
-     * Runs the interpreter for the given expression, and handles runtime errors if need be.
-     * Prints the result of the expression to standard output.
-     * @param expression    The expression that is to be interpreted.
+     * Runs the interpreter for the given statement list, and handles runtime errors if need be.
+     * Executes the statements in order in which they are given.
+     * @param statements    The statements that are to be interpreted, in the given order.
      */
-    public void interpret(Expr expression) {
+    public void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
@@ -98,6 +101,29 @@ public class Interpreter implements Expr.Visitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return null;
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null; // Return nothing -> Void return type
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value)); // Workings of print
+        return null;
+    }
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        return null;
+    }
+
     /**
      * Checks whether the given operands are both a double. If they aren't, a {@link RuntimeError} is thrown.
      * @param operator  The operator associated with the given operand.
@@ -173,5 +199,13 @@ public class Interpreter implements Expr.Visitor<Object> {
      */
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    /**
+     * Executes a statement
+     * @param statement  The statement to be executed
+     */
+    private void execute(Stmt statement) {
+        statement.accept(this);
     }
 }

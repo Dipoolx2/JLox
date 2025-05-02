@@ -1,5 +1,6 @@
 package lox;
 
+import java.sql.Statement;
 import java.util.List;
 
 import java.io.BufferedReader;
@@ -94,13 +95,13 @@ public class Lox {
 
         // Parsing phase
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return;
 
         // Interpreting phase
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 
     /**

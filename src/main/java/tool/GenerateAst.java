@@ -18,11 +18,13 @@ public class GenerateAst {
                 "Binary     : Expr left, Token operator, Expr right",
                 "Grouping   : Expr expression",
                 "Literal    : Object value",
-                "Unary      : Token operator, Expr right"
+                "Unary      : Token operator, Expr right",
+                "Variable   : Token name" // Variable accessing
         ));
         defineAst(outputDirectory, "Stmt", Arrays.asList(
-                "Expression : Expr expression", // Expression statements
-                "Print      : Expr expression"  // Print statements
+                "Expression : Expr expression",             // Expression statements
+                "Print      : Expr expression",             // Print statements
+                "Var        : Token name, Expr initializer" // Variable declaration
         ));
     }
 

@@ -1,5 +1,6 @@
 package lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static lox.TokenType.*;
@@ -26,16 +27,85 @@ public class Parser {
     }
 
     /**
-     * Attempts to parse the token list into an expression using the specified grammar.
+     * Attempts to parse the token list into a statement list using the specified grammar.
      * <b>In case of failure it returns null for now.</b>
-     * @return  The AST as an {@link Expr} object.
+     * @return  The AST as a list of {@link Stmt}.
      */
-    public Expr parse() {
+    public List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        // Until the end has been reached, keep parsing statements.
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        return statements;
+    }
+
+    /**
+     * Generates AST for declaration from the current token. <br>
+     * {@code declaration -> varDecl | statement}
+     * @return  An AST of type {@link Stmt}.
+     */
+    private Stmt declaration() {
         try {
-            return expression();
+            if (match(VAR)) return varDeclaration();
+
+            return statement();
         } catch (ParseError error) {
+            // Entering panic mode: Synchronize.
+            // This is the correct place to synchronize since this method is repeatedly called when parsing statements.
+            synchronize();
             return null;
         }
+    }
+
+    /**
+     * Generates AST for var declaration from the current token. <br>
+     * {@code varDecl ->} <br>
+     * {@code "var" IDENTIFIER ("=" expression)? ";"}
+     * @return An AST of type {@link Stmt}.
+     */
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
+    /**
+     * Generates AST for statement from the current token.
+     * @return An AST of type {@link Stmt}.
+     */
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    /**
+     * Generates AST for expression statement.
+     * @return An AST of type {@link Stmt}
+     */
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
+    /**
+     * Generates AST for print statement.
+     * @return An AST of type {@link Stmt}
+     */
+    private Stmt printStatement() {
+        Expr expr = expression(); // Expression to print
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Print(expr);
     }
 
     /**
@@ -143,6 +213,11 @@ public class Parser {
         if (match(NIL)) return new Expr.Literal(null);
 
         if (match(NUMBER, STRING)) return new Expr.Literal(previous().literal);
+
+        // In case of variable expression
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
+        }
 
         // In case of a parenthesized expression
         if (match(LEFT_PAREN)) {
