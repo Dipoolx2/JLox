@@ -18,6 +18,9 @@ public class Parser {
     private final List<Token> tokens;
     private int current = 0; // Pointer to the current token during the parsing process
 
+    // Says whether to suppress any error messages.
+    private boolean suppressErrors = false;
+
     /**
      * Constructs an object of type {@link Parser}.
      * @param tokens    The list of tokens that are to be parsed by the constructed parser.
@@ -40,6 +43,21 @@ public class Parser {
         }
 
         return statements;
+    }
+
+    /**
+     * Attempts to parse an expression.
+     * @return  Expression if successful, null if unsuccessful.
+     */
+    public Expr attemptExpression() {
+        suppressErrors = true;
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        } finally {
+            suppressErrors = false;
+        }
     }
 
     /**
@@ -131,7 +149,7 @@ public class Parser {
      * {@code expression -> assignment} <br>according to the rules of recursive descent.
      * @return An AST of type {@link Expr}
      */
-    private Expr expression() {
+    public Expr expression() {
         return assignment(); // Simple rule.
     }
 
@@ -349,7 +367,7 @@ public class Parser {
      * @return          The parse error object.
      */
     private ParseError error(Token token, String message) {
-        Lox.error(token, message);
+        if (!suppressErrors) Lox.error(token, message);
         return new ParseError();
     }
 

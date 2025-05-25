@@ -251,4 +251,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             this.environment = previous;
         }
     }
+
+    /**
+     * Evaluates the expression and returns the string representation.
+     * @param expression    The expression to evaluate.
+     * @return              The string representation of the evaluated {@code expression}.
+     */
+    public String getStringEvaluation(Expr expression) {
+        try {
+            Object value = evaluate(expression);
+            return stringify(value);
+        } catch (RuntimeError error) {
+            Lox.runtimeError(error);
+            return null;
+        }
+    }
 }

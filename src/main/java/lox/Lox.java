@@ -54,7 +54,7 @@ public class Lox {
      */
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, Charset.defaultCharset()), false);
 
         // Check for errors and signal unusual termination to the shell
         if (hadError) System.exit(65);
@@ -77,7 +77,7 @@ public class Lox {
 
             // This is triggered when the user exits the prompt by e.g. CTRL+D.
             if (line == null) break;
-            run(line);
+            run(line, true);
 
             // Reset the error state: Don't crash the entire prompt if one line errors.
             hadError = false;
@@ -88,7 +88,7 @@ public class Lox {
      * Runs a given script with the Lox interpreter.
      * @param source The source code to be run by the interpreter.
      */
-    private static void run(String source) {
+    private static void run(String source, boolean throughRepl) {
         Scanner scanner = new Scanner(source);
 
         // Scanning phase
@@ -96,6 +96,11 @@ public class Lox {
 
         // Parsing phase
         Parser parser = new Parser(tokens);
+
+        // For REPL sessions, try to parse expression. If this doesn't work, do a statement.
+        if (throughRepl && attemptReplExpression(parser))
+            return;
+
         List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error.
@@ -103,6 +108,24 @@ public class Lox {
 
         // Interpreting phase
         interpreter.interpret(statements);
+    }
+
+    /**
+     * Attempts the execution of an expression. If successful, prints the output to output.
+     * @return  True iff execution was successful.
+     */
+    private static boolean attemptReplExpression(Parser parser) {
+        Expr expression = parser.attemptExpression();
+
+        if (expression == null)
+            return false;
+
+        String stringValue = interpreter.getStringEvaluation(expression);
+        if (stringValue == null)
+            return false;
+
+        System.out.println(stringValue);
+        return true;
     }
 
     /**
