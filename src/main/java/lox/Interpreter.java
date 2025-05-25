@@ -2,6 +2,8 @@ package lox;
 
 import java.util.List;
 
+import static lox.Environment.UNASSIGNED;
+
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Environment environment = new Environment();
@@ -130,7 +132,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        Object value = null;
+        Object value = UNASSIGNED;
         if (stmt.initializer != null) { // Also allow defining variables with null.
             value = evaluate(stmt.initializer);
         }

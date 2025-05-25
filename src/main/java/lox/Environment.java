@@ -46,6 +46,12 @@ public class Environment {
      */
     public Object get(Token name) {
         if (values.containsKey(name.lexeme)) {
+            Object value = values.get(name.lexeme);
+            if (value == UNASSIGNED) {
+                throw new RuntimeError(name,
+                        "Uninitialized variable '" + name.lexeme + "'.");
+            }
+
             return values.get(name.lexeme);
         }
 
@@ -80,5 +86,15 @@ public class Environment {
         throw new RuntimeError(name,
                 "Undefined variable '" + name.lexeme + "'.");
     }
+
+    /**
+     * Unassigned sentinel object; used to detect whether a variable is unassigned.
+     */
+    public static final Object UNASSIGNED = new Object() {
+        @Override
+        public String toString() {
+            return "UNASSIGNED";
+        }
+    };
 
 }
