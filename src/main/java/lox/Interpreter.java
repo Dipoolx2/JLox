@@ -139,6 +139,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(this.environment));
+        return null;
+    }
+
     /**
      * Checks whether the given operands are both a double. If they aren't, a {@link RuntimeError} is thrown.
      * @param operator  The operator associated with the given operand.
@@ -222,5 +228,27 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
      */
     private void execute(Stmt statement) {
         statement.accept(this);
+    }
+
+    /**
+     * Executes a block statement
+     * @param statements    The statements that need to be executed.
+     * @param environment   The environment to execute the statements in.
+     */
+    private void executeBlock(List<Stmt> statements, Environment environment) {
+        // Save the original environment to return back to after execution.
+        Environment previous = this.environment;
+
+        try {
+            this.environment = environment;
+
+            // Execute the statements
+            for (Stmt stmt : statements) {
+                execute(stmt);
+            }
+        } finally {
+            // Restore the original environment, even if the execution fails.
+            this.environment = previous;
+        }
     }
 }

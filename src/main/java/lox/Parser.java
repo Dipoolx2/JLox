@@ -84,6 +84,7 @@ public class Parser {
      */
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
     }
@@ -96,6 +97,23 @@ public class Parser {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    /**
+     * Generates AST for block statements.
+     * @return  An AST of type {@link Stmt}
+     */
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            // Just keep adding new statements until the end of the block is reached.
+            statements.add(declaration());
+        }
+
+        // The error is only triggered if the end is reached before '}' was encountered.
+        consume(RIGHT_BRACE, "Expected '}' after a code block.");
+        return statements;
     }
 
     /**
