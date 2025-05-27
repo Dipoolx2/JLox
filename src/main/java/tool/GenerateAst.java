@@ -26,7 +26,10 @@ public class GenerateAst {
                 "Expression : Expr expression",             // Expression statements
                 "Print      : Expr expression",             // Print statements
                 "Var        : Token name, Expr initializer",// Variable declaration
-                "Block      : List<Stmt> statements"        // Statement blocks
+                "Block      : List<Stmt> statements",       // Statement blocks
+                "If         : Expr condition, " +
+                             "Stmt thenStmt, " +
+                             "Stmt elseStmt"                  // If statements
         ));
     }
 

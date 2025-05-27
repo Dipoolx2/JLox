@@ -147,6 +147,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenStmt);
+        } else {
+            execute(stmt.elseStmt);
+        }
+        return null;
+    }
+
     /**
      * Checks whether the given operands are both a double. If they aren't, a {@link RuntimeError} is thrown.
      * @param operator  The operator associated with the given operand.

@@ -103,8 +103,27 @@ public class Parser {
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
-
+        if (match(IF)) return ifStmt();
         return expressionStatement();
+    }
+
+    /**
+     * Generates AST for if statements from the current token.
+     * @return  An AST of type {@link Stmt}.
+     */
+    private Stmt ifStmt() {
+        consume(LEFT_PAREN, "Expected '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expected ')' after if condition.");
+
+        Stmt thenStmt = statement();
+        Stmt elseStmt = null;
+
+        if (match(ELSE)) {
+            elseStmt = statement();
+        }
+
+        return new Stmt.If(condition, thenStmt, elseStmt);
     }
 
     /**
