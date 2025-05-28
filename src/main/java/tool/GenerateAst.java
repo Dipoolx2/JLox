@@ -29,7 +29,8 @@ public class GenerateAst {
                 "Block      : List<Stmt> statements",       // Statement blocks
                 "If         : Expr condition, " +
                              "Stmt thenStmt, " +
-                             "Stmt elseStmt"                  // If statements
+                             "Stmt elseStmt",               // If statements
+                "While      : Expr condition, Stmt stmt"    // While statements
         ));
     }
 

@@ -104,7 +104,24 @@ public class Parser {
         if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
         if (match(IF)) return ifStmt();
+        if (match(WHILE)) return whileStmt();
+
         return expressionStatement();
+    }
+
+    /**
+     * Generates AST for while statements from the current token.
+     * @return  An AST of type {@link Stmt}.
+     */
+    private Stmt whileStmt() {
+        consume(LEFT_PAREN, "Expected '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expected ')' after while condition.");
+
+        // Executed with each loop iteration
+        Stmt stmt = statement();
+
+        return new Stmt.While(condition, stmt);
     }
 
     /**
