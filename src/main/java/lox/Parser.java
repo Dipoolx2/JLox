@@ -194,7 +194,7 @@ public class Parser {
      * @return An AST of type {@link Expr}.
      */
     private Expr assignment() {
-        Expr expr = equality(); // First parse the entire LHS. It can be more than just one token.
+        Expr expr = logicOr(); // First parse the entire LHS. It can be more than just one token.
 
         if (match(EQUAL)) { // If not it was equality() to begin with.
             Token equals = previous();
@@ -208,6 +208,38 @@ public class Parser {
             error(equals, "Invalid assignment target.");
         }
         return expr;
+    }
+
+    /**
+     * Generates AST for a logical or expression from the curren token.
+     * @return  An AST of type {@link Expr}.
+     */
+    private Expr logicOr() {
+        Expr left = logicAnd();
+
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = logicAnd();
+            left = new Expr.Logical(left, operator, right);
+        }
+
+        return left;
+    }
+
+    /**
+     * Generates AST for a logical and expression from the curren token.
+     * @return  An AST of type {@link Expr}.
+     */
+    private Expr logicAnd() {
+        Expr left = equality();
+
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            left = new Expr.Logical(left, operator, right);
+        }
+
+        return left;
     }
 
     /**
